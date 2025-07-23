@@ -1,0 +1,1373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Irregular Verbs Trainer - British English</title>
+<link href="https://fonts.googleapis.com/css2?family=Comic+Sans+MS&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary-color: #4f6ef7;
+    --secondary-color: #9fc8ff;
+    --correct-color: #00e676; /* Остается для общего "Correct!" */
+    --wrong-color: #ff5252;
+    --timer-color: #ffeb3b;
+    --button-color: #4285f4;
+    --button-hover: #3367d6;
+    --button-active: #2a56c7;
+    --text-color: #fff;
+    --bg-transparent: rgba(255,255,255,0.1);
+    --shadow: 0 8px 20px rgba(0,0,0,0.3);
+    --verb-color: #FFD700; /* Золотой для глаголов */
+    --correct-full-color: #4CAF50; /* Зеленый для "Correct!" */
+    --wrong-full-color: #2196F3; /* Синий для "Wrong!" */
+
+    /* Новые переменные для ваших цветов */
+    --matte-green: #4CAF50; /* Матово-зеленый для кнопки Start Game */
+    --results-header-bright-green: #00FF00; /* Ярко-зеленый для "Results" */
+    --player-label-color: #FFD700; /* Цвет для "Player:" - остается */
+    --answered-color: #00BFFF; /* Бирюзово-голубой для "You answered:" */
+    --correct-answers-color-bright: #00FF00; /* Ярко-зеленый для "Correct answers:" и числа правильных */
+    --total-answers-color-bright: #FF4500; /* Ярко-оранжевый для общего количества */
+    --success-rate-color: #FFC107; /* Желтый для "Success rate:" - остается */
+    --date-color: #FFFFFF; /* Белый для "Date:" */
+
+    /* Цвета для ачивок */
+    --achievement-bg: rgba(255, 255, 255, 0.15);
+    --achievement-border: #FFD700; /* Золотой */
+    --achievement-text: #FFD700; /* Золотой */
+    --achievement-unlocked: #4CAF50; /* Зеленый */
+  }
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+  body {
+    font-family: 'Comic Sans MS', cursive, sans-serif;
+    background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+    color: var(--text-color);
+    display: flex;
+    justify-content: center;
+    align-items: flex-start; /* Изменено на flex-start, чтобы контент не центрировался вертикально */
+    min-height: 100vh;
+    margin: 0;
+    padding: 20px;
+    line-height: 1.6;
+    overflow-y: auto;
+    padding: 20px 0;
+  }
+  .container {
+    background: rgba(0, 0, 0, 0.7);
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: var(--shadow);
+    text-align: center;
+    width: 100%;
+    max-width: 900px;
+    margin-top: 20px; /* Отступ сверху для центрирования */
+    margin-bottom: 20px; /* Отступ снизу для центрирования */
+    backdrop-filter: blur(5px);
+    position: relative;
+    z-index: 1;
+  }
+  h1 {
+    color: var(--verb-color);
+    margin-bottom: 25px;
+    font-size: 2.5em;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+    font-family: 'Comic Sans MS', cursive, sans-serif; /* Единый шрифт */
+  }
+
+  /* Обновленные стили для полей ввода */
+  .form-group {
+    margin-bottom: 1.5rem;
+    display: flex; /* Используем flexbox */
+    align-items: center; /* Выравниваем элементы по центру вертикально */
+    justify-content: center; /* Центрируем группу по горизонтали */
+    gap: 1rem; /* Промежуток между label и input/select */
+  }
+  .form-group label {
+    display: inline-block; /* Теперь label не занимает всю ширину */
+    margin-bottom: 0; /* Убираем нижний отступ */
+    font-weight: bold;
+    font-family: 'Comic Sans MS', cursive, sans-serif;
+    font-size: 1.3rem; /* Крупнее */
+    color: var(--text-color); /* Чтобы текст был виден */
+    text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+    animation: pulsateLabel 2s infinite alternate; /* Анимация пульсации */
+  }
+  @keyframes pulsateLabel {
+    0% { transform: scale(1); opacity: 1; }
+    100% { transform: scale(1.03); opacity: 0.95; }
+  }
+
+  input[type="text"],
+  select {
+    width: auto; /* Автоматическая ширина, чтобы не занимать всю строку */
+    min-width: 200px; /* Минимальная ширина для читаемости */
+    padding: 0.8rem;
+    border-radius: 8px;
+    border: 2px solid transparent;
+    outline: none;
+    font-size: 1.1rem;
+    background: rgba(255,255,255,0.9);
+    color: #333;
+    font-family: 'Comic Sans MS', cursive, sans-serif; /* Единый шрифт */
+  }
+  input:focus, select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(79, 110, 247, 0.3);
+  }
+  .btn {
+    /* Стили для кнопки Start Game */
+    background-color: var(--matte-green); /* Матово-зеленый */
+    color: white;
+    border: none;
+    padding: 1rem 2rem;
+    border-radius: 50px;
+    cursor: pointer;
+    font-size: 1.2rem;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow);
+    margin-top: 1rem;
+    font-family: 'Comic Sans MS', cursive, sans-serif;
+    text-shadow: 0 1px 1px rgba(0,0,0,0.2);
+    letter-spacing: 1px;
+  }
+  .btn:hover {
+    transform: translateY(-3px);
+    box-shadow:
+      0 10px 15px rgba(0,0,0,0.25),
+      0 4px 6px rgba(0,0,0,0.2),
+      inset 0 2px 0 rgba(255,255,255,0.3),
+      inset 0 -2px 0 rgba(0,0,0,0.2);
+  }
+  .timer {
+    font-size: 1.4rem;
+    color: var(--timer-color);
+    margin-bottom: 1rem;
+    font-weight: bold;
+    display: inline-block; /* Чтобы можно было рядом с очками */
+  }
+  /* Убран блок .score */
+  .verb {
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin: 1.5rem 0;
+    min-height: 3.5rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: var(--verb-color);
+    text-shadow:
+      0 1px 0 rgba(255,255,255,0.3),
+      0 2px 0 rgba(255,255,255,0.2),
+      0 3px 5px rgba(0,0,0,0.2);
+    animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    transform: scale(0);
+    opacity: 0;
+    font-family: 'Comic Sans MS', cursive, sans-serif;
+  }
+  @keyframes popIn {
+    0% { transform: scale(0); opacity: 0; }
+    80% { transform: scale(1.1); opacity: 1; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  .full-screen-feedback {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+    pointer-events: none;
+    animation: fadeOut 1.5s ease 0.5s forwards; /* Увеличено время анимации */
+  }
+  .feedback-text {
+    font-size: 5rem;
+    font-weight: bold;
+    text-shadow:
+      0 1px 0 rgba(255,255,255,0.3),
+      0 2px 0 rgba(255,255,255,0.2),
+      0 3px 5px rgba(0,0,0,0.2);
+    animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    transform: scale(0);
+    opacity: 0;
+    font-family: 'Comic Sans MS', cursive, sans-serif;
+  }
+  .correct-feedback {
+    color: var(--correct-full-color);
+  }
+  .wrong-feedback {
+    color: var(--wrong-full-color);
+  }
+  @keyframes fadeOut {
+    to { opacity: 0; }
+  }
+  .translation {
+    font-size: 1.2rem;
+    margin-bottom: 1.5rem;
+    font-style: italic;
+    opacity: 0.8;
+  }
+  .inputs {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  .input-box {
+    flex: 1 1 200px;
+    padding: 0.8rem;
+    font-size: 1.1rem;
+    border-radius: 8px;
+    border: 2px solid transparent;
+    outline: none;
+    text-align: center;
+    background: rgba(255,255,255,0.9);
+    color: #333;
+    transition: all 0.3s ease;
+    font-family: 'Comic Sans MS', cursive, sans-serif;
+  }
+  .input-box:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(79, 110, 247, 0.3);
+  }
+  .result {
+    min-height: 2rem;
+    font-size: 1.3rem;
+    font-weight: bold;
+    margin: 1rem 0;
+    transition: all 0.3s ease;
+  }
+  .correct {
+    color: var(--correct-color);
+  }
+  .wrong {
+    color: var(--wrong-color);
+  }
+  .table-container {
+    width: 100%;
+    overflow-x: auto;
+    margin: 1.5rem 0;
+    border-radius: 8px;
+    background: rgba(0,0,0,0.1);
+  }
+  .results-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+  }
+  .results-table th,
+  .results-table td {
+    padding: 0.6rem;
+    text-align: center;
+    border: 1px solid rgba(255,255,255,0.2);
+  }
+  .results-table th {
+    background: rgba(0,0,0,0.2);
+    font-weight: bold;
+  }
+  .results-table tr:nth-child(even) {
+    background: rgba(0,0,0,0.05);
+  }
+  .restart-btn {
+    margin-top: 1rem;
+    background: linear-gradient(
+      to bottom,
+      var(--button-color) 0%,
+      var(--button-hover) 50%,
+      var(--button-active) 100%
+    );
+    color: white;
+    border: none;
+    padding: 1rem 2rem;
+    border-radius: 50px;
+    cursor: pointer;
+    font-size: 1.2rem;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    box-shadow:
+      0 6px 10px rgba(0,0,0,0.2),
+      0 2px 4px rgba(0,0,0,0.15),
+      inset 0 2px 0 rgba(255,255,255,0.3),
+      inset 0 -2px 0 rgba(0,0,0,0.2);
+    position: relative;
+    overflow: hidden;
+    transform: translateY(0);
+    font-family: 'Comic Sans MS', cursive, sans-serif;
+    text-shadow: 0 1px 1px rgba(0,0,0,0.2);
+    letter-spacing: 1px;
+  }
+  .restart-btn:hover {
+    transform: translateY(-3px);
+    box-shadow:
+      0 10px 15px rgba(0,0,0,0.25),
+      0 4px 6px rgba(0,0,0,0.2),
+      inset 0 2px 0 rgba(255,255,255,0.3),
+      inset 0 -2px 0 rgba(0,0,0,0.2);
+  }
+  .stats {
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+    font-weight: bold;
+    text-align: left; /* Выравнивание для списка результатов */
+    margin-left: auto;
+    margin-right: auto;
+    max-width: fit-content; /* Ограничиваем ширину для центрирования */
+  }
+  .stats p {
+    margin-bottom: 0.5rem;
+    font-family: 'Comic Sans MS', cursive, sans-serif; /* Единый шрифт */
+  }
+  .stats .player-name {
+    color: var(--player-label-color); /* Золотой */
+  }
+  .stats .answered-count {
+    color: var(--answered-color); /* Темно-синий */
+  }
+  .stats .correct-answers {
+    color: var(--correct-answers-color-bright); /* Ярко-зеленый для "Correct answers:" и числа правильных */
+  }
+  .stats .total-number {
+    color: var(--total-answers-color-bright); /* Ярко-оранжевый для общего количества */
+  }
+  .stats .success-rate {
+    color: var(--success-rate-color); /* Желтый */
+  }
+  .leaderboard {
+    margin-top: 2rem;
+    padding: 1.5rem;
+    background: rgba(255, 215, 0, 0.1);
+    border: 1px solid rgba(255, 215, 0, 0.3);
+    border-radius: 12px;
+    font-size: 1.1rem;
+  }
+  .leaderboard-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #FFD700;
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+    margin-bottom: 1rem;
+    font-family: 'Comic Sans MS', cursive, sans-serif; /* Единый шрифт */
+    animation: pulsate 1.5s infinite alternate; /* Анимация пульсации */
+  }
+  @keyframes pulsate {
+    0% { transform: scale(1); opacity: 1; text-shadow: 0 0 10px rgba(255, 215, 0, 0.5); }
+    100% { transform: scale(1.05); opacity: 0.9; text-shadow: 0 0 20px rgba(255, 215, 0, 0.8); }
+  }
+  .leaderboard ol {
+    text-align: left;
+    padding-left: 1.5rem;
+  }
+  .leaderboard li {
+    margin: 0.5rem 0;
+    color: white;
+    font-size: 0.95rem;
+  }
+  .results-header {
+    font-family: 'Comic Sans MS', cursive, sans-serif;
+    color: var(--results-header-bright-green); /* Ярко-зеленый для "Results" */
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    animation: pulsateResults 2s infinite alternate; /* Анимация пульсации для Results */
+  }
+  @keyframes pulsateResults {
+    0% { transform: scale(1); opacity: 1; }
+    100% { transform: scale(1.03); opacity: 0.95; text-shadow: 0 0 15px var(--results-header-bright-green); }
+  }
+
+  /* Стили для модального окна */
+  .modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 200; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+    justify-content: center;
+    align-items: center;
+    font-family: 'Comic Sans MS', cursive, sans-serif;
+  }
+
+  .modal-content {
+    background-color: #fefefe;
+    margin: auto;
+    padding: 30px;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 500px;
+    border-radius: 15px;
+    text-align: center;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+    color: #333;
+    font-size: 1.5rem;
+    font-weight: bold;
+  }
+
+  .modal-content button {
+    background-color: var(--matte-green);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 1.1rem;
+    margin-top: 20px;
+    transition: background-color 0.3s ease;
+  }
+
+  .modal-content button:hover {
+    background-color: #45a049;
+  }
+
+  /* Стили для кнопки воспроизведения в таблице */
+  .play-table-audio-btn {
+      background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white"><path d="M8 5v14l11-7z"/></svg>') no-repeat center center;
+      background-size: 80%; /* Размер иконки воспроизведения внутри кнопки */
+      width: 20px; /* Размер самой кнопки */
+      height: 20px; /* Размер самой кнопки */
+      border: none;
+      cursor: pointer;
+      background-color: rgba(255, 255, 255, 0.2); /* Немного прозрачный фон */
+      border-radius: 50%; /* Круглая кнопка */
+      vertical-align: middle; /* Выравнивание с текстом */
+      margin-left: 5px; /* Отступ от текста */
+      transition: background-color 0.2s ease, transform 0.2s ease;
+  }
+  .play-table-audio-btn:hover {
+      background-color: rgba(255, 255, 255, 0.4);
+      transform: scale(1.1);
+  }
+
+ /* Achievements Styles */
+  .achievements {
+    margin-top: 30px;
+    background: rgba(0, 0, 0, 0.4);
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: inset 0 0 15px rgba(0,0,0,0.4);
+    text-align: left;
+  }
+
+  .achievements-title {
+    font-size: 1.8em;
+    font-weight: bold;
+    color: var(--verb-color);
+    text-align: center;
+    margin-bottom: 20px;
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+  }
+
+  .achievement-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 15px;
+    justify-content: center;
+  }
+
+  .achievement-item {
+    background: rgba(255,255,255,0.08);
+    padding: 15px;
+    border-radius: 10px;
+    text-align: center;
+    opacity: 0.5; /* Заблокированные по умолчанию полупрозрачные */
+    transition: opacity 0.3s ease;
+    border: 2px dashed rgba(255,255,255,0.3); /* Пунктирная рамка для заблокированных */
+  }
+
+  .achievement-item.unlocked {
+    opacity: 1; /* Разблокированные полностью видимы */
+    border: 2px solid var(--verb-color); /* Золотая рамка для разблокированных */
+    box-shadow: 0 0 15px var(--verb-color), 0 0 30px rgba(255,215,0,0.5); /* Сияние */
+  }
+
+  .achievement-icon {
+    font-size: 2.5em;
+    margin-bottom: 5px;
+    display: block;
+  }
+
+  .achievement-name {
+    font-weight: bold;
+    font-size: 1.1em;
+    color: var(--text-color);
+    margin-bottom: 5px;
+  }
+
+  .achievement-description {
+    font-size: 0.9em;
+    color: rgba(255,255,255,0.8);
+  }
+
+  /* Achievement Notification Styles */
+  #achievementNotificationContainer {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1001;
+    display: flex;
+    flex-direction: column-reverse; /* Новые уведомления сверху */
+    gap: 10px;
+    pointer-events: none; /* Чтобы не блокировать клики под ними */
+  }
+
+  .achievement-notification {
+    background-color: var(--verb-color); /* Золотой фон */
+    color: #333;
+    padding: 15px 20px;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+    font-weight: bold;
+    font-size: 1.1em;
+    text-align: center;
+    animation: slideIn 0.5s ease-out forwards, fadeOut 1.5s 0.5s ease-out forwards;
+    opacity: 0; /* Начинаем скрытыми */
+  }
+
+  @keyframes slideInUp {
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @media (max-width: 600px) {
+    .container {
+      padding: 1.5rem;
+    }
+    h1 {
+      font-size: 1.6rem;
+    }
+    .verb {
+      font-size: 2rem;
+    }
+    .feedback-text {
+      font-size: 3rem;
+    }
+    .inputs {
+      flex-direction: column;
+    }
+    .input-box {
+      width: 100%;
+    }
+    .results-table {
+      font-size: 0.8rem;
+    }
+    .results-table th,
+    .results-table td {
+      padding: 0.4rem;
+    }
+    .restart-btn {
+      padding: 0.8rem 1.5rem;
+      font-size: 1.1rem;
+    }
+    /* Для мобильных: label над input/select */
+    .form-group {
+      flex-direction: column; /* Элементы будут располагаться столбиком */
+      align-items: center; /* Центрируем по горизонтали */
+      gap: 0.5rem; /* Уменьшаем промежуток */
+    }
+    .form-group label {
+        font-size: 1.1rem; /* Чуть меньше на мобильных */
+    }
+    input[type="text"], select {
+      min-width: unset; /* Сброс min-width для мобильных */
+      width: 100%; /* Занимает всю доступную ширину */
+      max-width: 250px; /* Ограничение ширины */
+    }
+    .modal-content {
+      width: 90%;
+      font-size: 1.2rem;
+    }
+    .play-table-audio-btn {
+        width: 18px;
+        height: 18px;
+    }
+    .achievement-item {
+        width: 100px;
+        min-height: 100px;
+    }
+    .achievement-icon {
+        font-size: 2rem;
+    }
+    .achievement-name {
+        font-size: 0.8rem;
+    }
+    .achievement-description {
+        font-size: 0.65rem;
+    }
+  }
+</style>
+</head>
+<body>
+  <div class="container" id="mainContainer"></div>
+  <div id="feedbackContainer"></div>
+
+  <div id="myModal" class="modal">
+    <div class="modal-content">
+      <p id="modalMessage"></p>
+      <button id="modalOkBtn">OK</button>
+    </div>
+  </div>
+
+  <div id="achievementNotificationContainer"></div>
+
+<script>
+// Полный список глаголов
+const verbs = [
+  {base:"arise", past:"arose", participle:"arisen", ru:"возникать"},
+  {base:"awake", past:"awoke", participle:"awoken", ru:"просыпаться"},
+  {base:"be", past:"was were", participle:"been", ru:"быть"},
+  {base:"bear", past:"bore", participle:"born", ru:"нести, рожать"},
+  {base:"beat", past:"beat", participle:"beaten", ru:"бить"},
+  {base:"become", past:"became", participle:"become", ru:"становиться"},
+  {base:"begin", past:"began", participle:"begun", ru:"начинать"},
+  {base:"bend", past:"bent", participle:"bent", ru:"сгибать"},
+  {base:"bet", past:"bet", participle:"bet", ru:"держать пари"},
+  {base:"bind", past:"bound", participle:"bound", ru:"связывать"},
+  {base:"bite", past:"bit", participle:"bitten", ru:"кусать"},
+  {base:"bleed", past:"bled", participle:"bled", ru:"кровоточить"},
+  {base:"blow", past:"blew", participle:"blown", ru:"дуть"},
+  {base:"break", past:"broke", participle:"broken", ru:"ломать"},
+  {base:"breed", past:"bred", participle:"bred", ru:"разводить"},
+  {base:"bring", past:"brought", participle:"brought", ru:"приносить"},
+  {base:"broadcast", past:"broadcast", participle:"broadcast", ru:"транслировать"},
+  {base:"build", past:"built", participle:"built", ru:"строить"},
+  {base:"burn", past:"burnt", participle:"burnt", ru:"жечь"},
+  {base:"burst", past:"burst", participle:"burst", ru:"взрываться"},
+  {base:"buy", past:"bought", participle:"bought", ru:"покупать"},
+  {base:"catch", past:"caught", participle:"caught", ru:"ловить"},
+  {base:"choose", past:"chose", participle:"chosen", ru:"выбирать"},
+  {base:"cling", past:"clung", participle:"clung", ru:"цепляться"},
+  {base:"come", past:"came", participle:"come", ru:"приходить"},
+  {base:"cost", past:"cost", participle:"cost", ru:"стоить"},
+  {base:"creep", past:"crept", participle:"crept", ru:"ползти"},
+  {base:"cut", past:"cut", participle:"cut", ru:"резать"},
+  {base:"deal", past:"dealt", participle:"dealt", ru:"иметь дело"},
+  {base:"dig", past:"dug", participle:"dug", ru:"копать"},
+  {base:"do", past:"did", participle:"done", ru:"делать"},
+  {base:"draw", past:"drew", participle:"drawn", ru:"рисовать"},
+  {base:"dream", past:"dreamt", participle:"dreamt", ru:"мечтать"},
+  {base:"drink", past:"drank", participle:"drunk", ru:"пить"},
+  {base:"drive", past:"drove", participle:"driven", ru:"водить"},
+  {base:"eat", past:"ate", participle:"eaten", ru:"есть"},
+  {base:"fall", past:"fell", participle:"fallen", ru:"падать"},
+  {base:"feed", past:"fed", participle:"fed", ru:"кормить"},
+  {base:"feel", past:"felt", participle:"felt", ru:"чувствовать"},
+  {base:"fight", past:"fought", participle:"fought", ru:"сражаться"},
+  {base:"find", past:"found", participle:"found", ru:"находить"},
+  {base:"fly", past:"flew", participle:" flown", ru:"летать"},
+  {base:"forbid", past:"forbade", participle:"forbidden", ru:"запрещать"},
+  {base:"forget", past:"forgot", participle:"forgotten", ru:"забывать"},
+  {base:"forgive", past:"forgave", participle:"forgiven", ru:"прощать"},
+  {base:"freeze", past:"froze", participle:"frozen", ru:"замерзать"},
+  {base:"get", past:"got", participle:"got", ru:"получать"},
+  {base:"give", past:"gave", participle:"given", ru:"давать"},
+  {base:"go", past:"went", participle:"gone", ru:"идти"},
+  {base:"grind", past:"ground", participle:"ground", ru:"молоть"},
+  {base:"grow", past:"grew", participle:"grown", ru:"расти"},
+  {base:"hang", past:"hung", participle:"hung", ru:"вешать"},
+  {base:"have", past:"had", participle:"had", ru:"иметь"},
+  {base:"hear", past:"heard", participle:"heard", ru:"слышать"},
+  {base:"hide", past:"hid", participle:"hidden", ru:"прятать"},
+  {base:"hit", past:"hit", participle:"hit", ru:"ударять"},
+  {base:"hold", past:"held", participle:"held", ru:"держать"},
+  {base:"hurt", past:"hurt", participle:"hurt", ru:"ранить"},
+  {base:"keep", past:"kept", participle:"kept", ru:"держать"},
+  {base:"kneel", past:"knelt", participle:"knelt", ru:"стоять на коленях"},
+  {base:"know", past:"knew", participle:"known", ru:"знать"},
+  {base:"lay", past:"laid", participle:"laid", ru:"класть"},
+  {base:"lead", past:"led", participle:"led", ru:"вести"},
+  {base:"lean", past:"leant", participle:"leant", ru:"наклоняться"},
+  {base:"learn", past:"learnt", participle:"learnt", ru:"учить"},
+  {base:"leave", past:"left", participle:"left", ru:"покидать"},
+  {base:"lend", past:"lent", participle:"lent", ru:"одалживать"},
+  {base:"lie", past:"lay", participle:"lain", ru:"лежать"},
+  {base:"light", past:"lit", participle:"lit", ru:"зажигать"},
+  {base:"lose", past:"lost", participle:"lost", ru:"терять"},
+  {base:"make", past:"made", participle:"made", ru:"делать"},
+  {base:"mean", past:"meant", participle:"meant", ru:"значить"},
+  {base:"meet", past:"met", participle:"met", ru:"встречать"},
+  {base:"mow", past:"mowed", participle:"mown", ru:"косить"},
+  {base:"overtake", past:"overtook", participle:"overtaken", ru:"обгонять"},
+  {base:"pay", past:"paid", participle:"paid", ru:"платить"},
+  {base:"put", past:"put", participle:"put", ru:"класть"},
+  {base:"read", past:"read", participle:"read", ru:"читать"},
+  {base:"ride", past:"rode", participle:"ridden", ru:"ездить верхом"},
+  {base:"ring", past:"rang", participle:"rung", ru:"звонить"},
+  {base:"rise", past:"rose", participle:"risen", ru:"подниматься"},
+  {base:"run", past:"ran", participle:"run", ru:"бежать"},
+  {base:"saw", past:"sawed", participle:"sawn", ru:"пилить"},
+  {base:"say", past:"said", participle:"said", ru:"сказать"},
+  {base:"see", past:"saw", participle:"seen", ru:"видеть"},
+  {base:"sell", past:"sold", participle:"sold", ru:"продавать"},
+  {base:"send", past:"sent", participle:"sent", ru:"отправлять"},
+  {base:"set", past:"set", participle:"set", ru:"устанавливать"},
+  {base:"sew", past:"sewed", participle:"sewn", ru:"шить"},
+  {base:"shake", past:"shook", participle:"shaken", ru:"трясти"},
+  {base:"shed", past:"shed", participle:"shed", ru:"проливать"},
+  {base:"shine", past:"shone", participle:"shone", ru:"светить"},
+  {base:"shoot", past:"shot", participle:"shot", ru:"стрелять"},
+  {base:"show", past:"showed", participle:"shown", ru:"показывать"},
+  {base:"shrink", past:"shrank", participle:"shrunk", ru:"сжиматься"},
+  {base:"shut", past:"shut", participle:"shut", ru:"закрывать"},
+  {base:"sing", past:"sang", participle:"sung", ru:"петь"},
+  {base:"sink", past:"sank", participle:"sunk", ru:"тонуть"},
+  {base:"sit", past:"sat", participle:"sat", ru:"сидеть"},
+  {base:"sleep", past:"slept", participle:"slept", ru:"спать"},
+  {base:"slide", past:"slid", participle:"slid", ru:"скользить"},
+  {base:"smell", past:"smelt", participle:"smelt", ru:"нюхать"},
+  {base:"sow", past:"sowed", participle:"sown", ru:"сеять"},
+  {base:"speak", past:"spoke", participle:"spoken", ru:"говорить"},
+  {base:"spell", past:"spelt", participle:"spelt", ru:"произносить по буквам"},
+  {base:"spend", past:"spent", participle:"spent", ru:"тратить"},
+  {base:"spill", past:"spilt", participle:"spilt", ru:"проливать"},
+  {base:"spin", past:"spun", participle:"spun", ru:"прясть"},
+  {base:"spit", past:"spat", participle:"spat", ru:"плевать"},
+  {base:"spread", past:"spread", participle:"spread", ru:"распространять"},
+  {base:"stand", past:"stood", participle:"stood", ru:"стоять"},
+  {base:"steal", past:"stole", participle:"stolen", ru:"красть"},
+  {base:"stick", past:"stuck", participle:"stuck", ru:"приклеивать"},
+  {base:"sting", past:"stung", participle:"stung", ru:"жалить"},
+  {base:"stink", past:"stank", participle:"stunk", ru:"вонять"},
+  {base:"strike", past:"struck", participle:"struck", ru:"ударять"},
+  {base:"swear", past:"swore", participle:"sworn", ru:"клясться"},
+  {base:"sweep", past:"swept", participle:"swept", ru:"подметать"},
+  {base:"swell", past:"swelled", participle:"swollen", ru:"опухать"},
+  {base:"swim", past:"swam", participle:"swum", ru:"плавать"},
+  {base:"swing", past:"swung", participle:"swung", ru:"качаться"},
+  {base:"take", past:"took", participle:"taken", ru:"брать"},
+  {base:"teach", past:"taught", participle:"taught", ru:"учить"},
+  {base:"tear", past:"tore", participle:"torn", ru:"рвать"},
+  {base:"tell", past:"told", participle:"told", ru:"рассказывать"},
+  {base:"think", past:"thought", participle:"thought", ru:"думать"},
+  {base:"throw", past:"threw", participle:"thrown", ru:"бросать"},
+  {base:"understand", past:"understood", participle:"understood", ru:"понимать"},
+  {base:"wake", past:"woke", participle:"woken", ru:"просыпаться"},
+  {base:"wear", past:"wore", participle:"worn", ru:"носить"},
+  {base:"weep", past:"wept", participle:"wept", ru:"плакать"},
+  {base:"win", past:"won", participle:"won", ru:"выигрывать"},
+  {base:"wind", past:"wound", participle:"wound", ru:"заводить (механизм)"},
+  {base:"withdraw", past:"withdrew", participle:"withdrawn", ru:"изымать"},
+  {base:"write", past:"wrote", participle:"written", ru:"писать"}
+];
+
+// Фильтруем common глаголы (все кроме lessCommon и advanced)
+const lessCommonList = ["arise","awake","bear","bend","bet","bleed","breed","broadcast","deal","kneel","mow","overtake","sew","stink","strike"];
+const advancedList = ["bind","burst","cling","creep","grind","saw","shed","sow","spit","swell","weep","wind"];
+const commonVerbs = verbs.filter(v => !lessCommonList.includes(v.base) && !advancedList.includes(v.base));
+
+// Делим common на 5 частей по 21 глаголу
+const commonParts = [];
+for (let i = 0; i < 5; i++) {
+  commonParts[i] = commonVerbs.slice(i * 21, (i + 1) * 21);
+}
+
+// Группы и их отображаемые имена
+const verbGroups = {
+  common1: { verbs: commonParts[0], name: "Common (part 1)" },
+  common2: { verbs: commonParts[1], name: "Common (part 2)" },
+  common3: { verbs: commonParts[2], name: "Common (part 3)" },
+  common4: { verbs: commonParts[3], name: "Common (part 4)" },
+  common5: { verbs: commonParts[4], name: "Common (part 5)" },
+  lessCommon: { verbs: verbs.filter(v => lessCommonList.includes(v.base)), name: "Less Common (15 verbs)" },
+  advanced: { verbs: verbs.filter(v => advancedList.includes(v.base)), name: "Advanced (12 verbs)" },
+  all: { verbs: verbs, name: "All (132 verbs)" }
+};
+
+// Сообщения для всплывающего окна (все правильно)
+const allCorrectMessages = [
+  "Wow, cool! Jump to the next training!",
+  "Yay! The next training is calling you - go, go, go!",
+  "Great! Run to the next one, superhero!",
+  "Nice! The next training is waiting - don’t be lazy!",
+  "Hooray! Show the next training who’s the boss!",
+  "Awesome! One more training and you’ll be a star!",
+  "Good job! Next level - let’s go!",
+  "Wow! The next training can’t wait for you!"
+];
+
+// Сообщения для всплывающего окна (не все правильно)
+const notAllCorrectMessages = [
+  "Almost there! Next time you’ll be the champion!",
+  "Good try! You’re getting better and better!",
+  "Nice work! A little more practice - and you’ll smash it!",
+  "You’re awesome anyway! Try again and win next time!",
+  "So close! One more go and you’ll get it!",
+  "Don’t worry! Even superheroes train a lot!",
+  "Great effort! The top score is waiting for you!",
+  "Keep going! Every try makes you stronger!"
+];
+
+// Определения достижений
+const achievements = {
+  novice: { name: "Novice", description: "Complete your first game.", icon: "🌟" },
+  master_common1: { name: "Master Common 1", description: "100% correct in Common (part 1).", icon: "🥇" },
+  master_common2: { name: "Master Common 2", description: "100% correct in Common (part 2).", icon: "🥇" },
+  master_common3: { name: "Master Common 3", description: "100% correct in Common (part 3).", icon: "🥇" },
+  master_common4: { name: "Master Common 4", description: "100% correct in Common (part 4).", icon: "🥇" },
+  master_common5: { name: "Master Common 5", description: "100% correct in Common (part 5).", icon: "🥇" },
+  master_lessCommon: { name: "Master Less Common", description: "100% correct in Less Common.", icon: "🏆" },
+  master_advanced: { name: "Master Advanced", description: "100% correct in Advanced.", icon: "🏅" },
+  ultimate_champion: { name: "Ultimate Champion", description: "100% correct in All verbs.", icon: "👑" },
+};
+
+class VerbsTrainer {
+  constructor() {
+    this.players = JSON.parse(localStorage.getItem('verbPlayers') || '{}');
+    this.currentPlayer = null;
+    this.currentVerbGroupKey = null; // Добавлено для сохранения ключа группы
+    this.verbs = [];
+    this.currentIndex = 0;
+    this.timeLeft = 30;
+    this.timer = null;
+    this.results = []; // Результаты текущей игры
+    this.gameStartTime = null; // Для отслеживания времени начала игры
+    this.britishVoice = null; // Для хранения найденного британского голоса
+    // this.currentScore = 0; // Удалена переменная для очков
+
+    this.initializeSpeechSynthesis(); // Инициализация синтеза речи
+    this.initialize();
+  }
+
+  initializeSpeechSynthesis() {
+      if ('speechSynthesis' in window) {
+          speechSynthesis.onvoiceschanged = () => {
+              const voices = speechSynthesis.getVoices();
+              this.britishVoice = voices.find(voice => voice.lang === 'en-GB' || (voice.lang.startsWith('en-') && voice.name.includes('UK')));
+              if (!this.britishVoice) {
+                  this.britishVoice = voices.find(voice => voice.lang.startsWith('en-'));
+              }
+              if (!this.britishVoice) {
+                  console.warn("No English voice found for speech synthesis.");
+              }
+          };
+          speechSynthesis.getVoices(); 
+      } else {
+          console.warn("Web Speech API is not supported in this browser.");
+      }
+  }
+
+  playSpeech(text) {
+      if (!text || !('speechSynthesis' in window)) {
+          console.warn("Speech synthesis not available or no text provided.");
+          return;
+      }
+      speechSynthesis.cancel(); 
+
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'en-GB';
+
+      if (this.britishVoice) {
+          utterance.voice = this.britishVoice;
+      } else {
+          utterance.lang = 'en-US';
+      }
+      
+      speechSynthesis.speak(utterance);
+  }
+
+  initialize() {
+    this.showStartScreen();
+  }
+  
+  showStartScreen() {
+    const lastPlayerName = localStorage.getItem('lastPlayerName') || '';
+    const lastVerbGroupKey = localStorage.getItem('lastVerbGroupKey') || 'common1';
+
+    document.getElementById("mainContainer").innerHTML = `
+      <h1>Irregular Verbs Trainer</h1>
+      <div class="form-group">
+        <label for="playerName">Your Name:</label>
+        <input type="text" id="playerName" placeholder="Enter your name" value="${lastPlayerName}" />
+      </div>
+      <div class="form-group">
+        <label for="verbGroup">Verb Group:</label>
+        <select id="verbGroup">
+          ${Object.keys(verbGroups).map(key => 
+            `<option value="${key}" ${key === lastVerbGroupKey ? 'selected' : ''}>${verbGroups[key].name}</option>`
+          ).join('')}
+        </select>
+      </div>
+      <button class="btn" id="startBtn">Start Game</button>
+      ${this.getLeaderboardHTML()}
+      ${this.getAchievementsHTML()}
+      <button class="restart-btn" id="deleteMyResultsBtn" style="background: #f44336; margin-top: 1rem;">Delete My Results</button>
+    `;
+    document.getElementById("startBtn").addEventListener("click", () => {
+      const name = document.getElementById("playerName").value.trim();
+      if (!name) {
+        alert("Please enter your name!");
+        return;
+      }
+      const groupKey = document.getElementById("verbGroup").value;
+
+      localStorage.setItem('lastPlayerName', name);
+      localStorage.setItem('lastVerbGroupKey', groupKey);
+
+      this.startGame(name, groupKey);
+    });
+    document.getElementById("deleteMyResultsBtn").addEventListener("click", () => {
+      const name = prompt("Enter your name to delete results:");
+      if (name && this.players[name]) {
+        if (confirm(`Delete all results for ${name}?`)) {
+          delete this.players[name];
+          localStorage.setItem('verbPlayers', JSON.stringify(this.players));
+          alert(`Results for ${name} deleted.`);
+          localStorage.removeItem('lastPlayerName'); 
+          localStorage.removeItem('lastVerbGroupKey');
+          this.showStartScreen();
+        }
+      } else {
+        alert("No results found for this name.");
+      }
+    });
+  }
+
+  startGame(name, groupKey) {
+    this.currentPlayer = name;
+    this.currentVerbGroupKey = groupKey;
+    this.verbs = [...verbGroups[groupKey].verbs];
+    this.shuffleVerbs();
+    this.currentIndex = 0;
+    this.results = [];
+    // this.currentScore = 0; // Удалено сброс очков
+    this.gameStartTime = Date.now();
+
+    // Инициализация игрока, если его нет
+    if (!this.players[this.currentPlayer]) {
+        this.players[this.currentPlayer] = {
+            records: [],
+            achievements: {},
+            // totalScore: 0 // Удалено totalScore
+        };
+        localStorage.setItem('verbPlayers', JSON.stringify(this.players)); // Сохраняем нового игрока
+    }
+
+
+    document.getElementById("mainContainer").innerHTML = `
+      <h1>Hi, ${this.currentPlayer}!</h1>
+      <div class="timer">Time left: <span id="timer">30</span> sec</div>
+      <div class="verb" id="verb"></div>
+      <div class="translation" id="translation"></div>
+      <div class="inputs">
+        <input type="text" class="input-box" id="pastSimple" placeholder="Past Simple" autocomplete="off" />
+        <input type="text" class="input-box" id="pastParticiple" placeholder="Past Participle" autocomplete="off" />
+      </div>
+      <p class="result" id="result"></p>
+    `;
+    document.getElementById("pastSimple").addEventListener("keydown", e => {
+      if (e.key === "Enter") document.getElementById("pastParticiple").focus();
+    });
+    document.getElementById("pastParticiple").addEventListener("keydown", e => {
+      if (e.key === "Enter") this.checkAnswer();
+    });
+    this.loadVerb();
+  }
+
+  shuffleVerbs() {
+    for (let i = this.verbs.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [this.verbs[i], this.verbs[j]] = [this.verbs[j], this.verbs[i]];
+    }
+  }
+
+  loadVerb() {
+    const currentVerb = this.verbs[this.currentIndex];
+    document.getElementById("verb").textContent = currentVerb.base.toUpperCase();
+    document.getElementById("translation").textContent = currentVerb.ru;
+    document.getElementById("pastSimple").value = "";
+    document.getElementById("pastParticiple").value = "";
+    document.getElementById("result").textContent = "";
+    document.getElementById("pastSimple").focus();
+    this.startTimer();
+  }
+
+startTimer() {
+    clearInterval(this.timer);
+    this.timeLeft = 30;
+    document.getElementById("timer").textContent = this.timeLeft;
+    this.timer = setInterval(() => {
+      this.timeLeft--;
+      document.getElementById("timer").textContent = this.timeLeft;
+      if (this.timeLeft <= 0) {
+        clearInterval(this.timer);
+        this.showResults();
+      }
+    }, 1000);
+  }
+
+  checkAnswer() {
+    const psInput = document.getElementById("pastSimple").value.trim().toLowerCase();
+    const ppInput = document.getElementById("pastParticiple").value.trim().toLowerCase();
+    const currentVerb = this.verbs[this.currentIndex];
+
+    // Изменено: используем checkForm для Past Simple всегда
+    const isPsCorrect = this.checkForm(psInput, currentVerb.past);
+    const isPpCorrect = this.checkForm(ppInput, currentVerb.participle);
+    const isCorrect = isPsCorrect && isPpCorrect;
+    
+    // Удалены строки, связанные с currentScore
+    // if (isCorrect) {
+    //   this.currentScore += 10;
+    //   document.getElementById("score").textContent = this.currentScore;
+    // }
+
+    this.saveResult(isCorrect);
+    
+    if (isCorrect) {
+      this.currentIndex++;
+      if (this.currentIndex < this.verbs.length) {
+        this.loadVerb(); 
+      } else {
+        const correctAnswers = this.results.filter(r => r.correct).length;
+        if (correctAnswers === this.verbs.length) {
+            this.showCompletionModal(true, true);
+        } else {
+            this.showCompletionModal(false, true);
+        }
+      }
+    } else {
+      this.showCompletionModal(false, true); 
+    }
+  }
+
+  // Изменено: улучшена функция checkForm для обработки составных форм
+  checkForm(input, correctForms) {
+    const formsArray = correctForms.toLowerCase().split(' ').map(f => f.trim());
+    // Добавляем саму фразу (например, "was were") как отдельный правильный вариант, если она содержит пробел
+    if (correctForms.toLowerCase().includes(' ')) {
+        formsArray.push(correctForms.toLowerCase());
+    }
+    return formsArray.includes(input);
+  }
+
+  saveResult(correct) {
+    const currentVerb = this.verbs[this.currentIndex];
+    this.results.push({
+      verb: currentVerb.base,
+      correct: correct,
+      yourPs: document.getElementById("pastSimple").value.trim() || "-",
+      yourPp: document.getElementById("pastParticiple").value.trim() || "-",
+      correctPs: currentVerb.past,
+      correctPp: currentVerb.participle,
+      ru: currentVerb.ru
+    });
+  }
+
+  showCompletionModal(allCorrectForMessage, showResultsAfterConfirm) {
+    clearInterval(this.timer);
+    const messages = allCorrectForMessage ? allCorrectMessages : notAllCorrectMessages;
+    const randomMessage = messages[Math.floor(Math.random() * messages.length)];
+    const modal = document.getElementById("myModal");
+    const modalMessage = document.getElementById("modalMessage");
+    const modalOkBtn = document.getElementById("modalOkBtn");
+
+    modalMessage.textContent = randomMessage;
+    modal.style.display = "flex";
+
+    // Функция закрытия модального окна
+    const closeModal = () => {
+      modal.style.display = "none";
+      if (showResultsAfterConfirm) {
+        this.showResults();
+      } else {
+        this.loadVerb();
+      }
+    };
+
+    // Обработчик клика
+    modalOkBtn.onclick = closeModal;
+
+    // Обработчик нажатия клавиш
+    const keyHandler = (e) => {
+      if (e.key === "Enter") {
+        closeModal();
+        // Убираем обработчик, чтобы не накапливались
+        modal.removeEventListener("keydown", keyHandler);
+      }
+    };
+
+    // Добавляем обработчик к модальному окну
+    modal.addEventListener("keydown", keyHandler);
+
+    // Также устанавливаем фокус на кнопку (чтобы Enter работал сразу)
+    setTimeout(() => modalOkBtn.focus(), 100);
+  }
+
+  showResults() {
+    clearInterval(this.timer);
+    const total = this.verbs.length;
+    const correct = this.results.filter(r => r.correct).length;
+    const percent = Math.round((correct / total) * 100) || 0;
+    const now = new Date();
+    const gameEndTime = Date.now();
+    const timeTakenMs = gameEndTime - this.gameStartTime;
+    
+    const minutes = Math.floor(timeTakenMs / 60000);
+    const seconds = ((timeTakenMs % 60000) / 1000).toFixed(0);
+    const formattedTime = `${minutes}m ${seconds < 10 ? '0' : ''}${seconds}s`;
+
+    const gameTime = now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+
+    // Проверяем и обновляем объект игрока
+    if (!this.players[this.currentPlayer]) {
+        this.players[this.currentPlayer] = {
+            records: [],
+            achievements: {},
+            // totalScore: 0 // Удалено totalScore
+        };
+    }
+    
+    // Добавляем запись о текущей игре
+    this.players[this.currentPlayer].records.push({
+      correct,
+      total,
+      percent,
+      date: now.toLocaleDateString(),
+      gameTime: gameTime,
+      time: formattedTime,
+      group: verbGroups[this.currentVerbGroupKey].name,
+      // score: this.currentScore // Удалено сохранение очков за эту игру
+    });
+
+    // Удалено обновление общего счета игрока
+    // this.players[this.currentPlayer].totalScore = (this.players[this.currentPlayer].totalScore || 0) + this.currentScore;
+
+    // Проверяем достижения и сохраняем
+    this.checkAchievements(correct, total);
+    localStorage.setItem('verbPlayers', JSON.stringify(this.players));
+
+    let html = `
+      <h1 class="results-header">Results</h1>
+      <div class="stats">
+        <p class="player-name">Player: ${this.currentPlayer}</p>
+        <p class="answered-count">You answered: ${this.results.length} verbs</p>
+        <p class="correct-answers">Correct answers: <span class="correct-number">${correct}</span>/<span class="total-number">${total}</span></p>
+        <p class="success-rate">Success rate: ${percent}%</p>
+        <p>Time Taken: ${formattedTime}</p>
+        </div>
+      <div class="table-container">
+        <table class="results-table">
+          <thead>
+            <tr>
+              <th>Verb</th>
+              <th>Your Past</th>
+              <th>Your Part.</th>
+              <th>Correct Past</th>
+              <th>Correct Part.</th>
+              <th>Translation</th>
+            </tr>
+          </thead>
+          <tbody>
+    `;
+    this.results.forEach(r => {
+      // Использование checkForm для определения класса корректности
+      const psClass = this.checkForm(r.yourPs.toLowerCase(), r.correctPs) ? 'correct' : 'wrong';
+      const ppClass = this.checkForm(r.yourPp.toLowerCase(), r.correctPp) ? 'correct' : 'wrong';
+      
+      // Разделение correctPs на отдельные кнопки для озвучки
+      const correctPsButtons = r.correctPs.split(' ').map(part => 
+          `<button class="play-table-audio-btn" data-word="${part}"></button>`
+      ).join('');
+      
+      const correctPpButtons = r.correctPp.split(' ').map(part => 
+          `<button class="play-table-audio-btn" data-word="${part}"></button>`
+      ).join('');
+
+      html += `
+        <tr>
+          <td>${r.verb} <button class="play-table-audio-btn" data-word="${r.verb}"></button></td>
+          <td class="${psClass}">${r.yourPs}</td>
+          <td class="${ppClass}">${r.yourPp}</td>
+          <td>${r.correctPs} ${correctPsButtons}</td>
+          <td>${r.correctPp} ${correctPpButtons}</td>
+          <td>${r.ru}</td>
+        </tr>
+      `;
+    });
+    html += `
+          </tbody>
+        </table>
+      </div>
+      <button class="restart-btn" id="restartBtn">Play Again</button>
+      ${this.getLeaderboardHTML()}
+      ${this.getAchievementsHTML()}
+      <button class="restart-btn" id="deleteMyResultsBtnBottom" style="background: #f44336; margin-top: 1rem;">Delete My Results</button>
+    `;
+    document.getElementById("mainContainer").innerHTML = html;
+    
+    document.querySelectorAll('.play-table-audio-btn').forEach(button => {
+        button.addEventListener('click', (event) => {
+            const wordToSpeak = event.target.dataset.word;
+            this.playSpeech(wordToSpeak); // Озвучиваем слово, указанное в data-word
+        });
+    });
+
+    document.getElementById("restartBtn").addEventListener("click", () => {
+      this.showStartScreen();
+    });
+    document.getElementById("deleteMyResultsBtnBottom").addEventListener("click", () => {
+      const name = prompt("Enter your name to delete results:");
+      if (name && this.players[name]) {
+        if (confirm(`Delete all results and achievements for ${name}?`)) {
+          delete this.players[name];
+          localStorage.setItem('verbPlayers', JSON.stringify(this.players));
+          alert(`Results for ${name} deleted.`);
+          localStorage.removeItem('lastPlayerName'); 
+          localStorage.removeItem('lastVerbGroupKey');
+          this.showStartScreen();
+        }
+      } else {
+        alert("No results found for this name.");
+      }
+    });
+    setTimeout(() => {
+      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+    }, 100);
+  }
+
+  getLeaderboardHTML() {
+    const allScores = [];
+    for (const playerName in this.players) {
+        // Убедитесь, что records существует
+        const records = this.players[playerName].records || [];
+        records.forEach(record => {
+            allScores.push({
+                name: playerName,
+                correct: record.correct,
+                total: record.total,
+                percent: record.percent,
+                date: record.date,
+                gameTime: record.gameTime || 'N/A',
+                time: record.time || 'N/A',
+                group: record.group || 'N/A',
+                // score: record.score || 0 // Удалено добавление очков в лидерборд
+            });
+        });
+    }
+    // Сортировка: сначала по проценту (убывание), затем по количеству правильных (убывание), затем по времени прохождения (возрастание)
+    allScores.sort((a, b) => {
+      if (b.percent !== a.percent) return b.percent - a.percent;
+      if (b.correct !== a.correct) return b.correct - a.correct;
+      // Удалена сортировка по очкам
+      // if (b.score !== a.score) return b.score - a.score;
+      
+      const timeToSeconds = (timeStr) => {
+          if (timeStr === 'N/A') return Infinity;
+          const parts = timeStr.match(/(\d+)m\s*(\d+)s/);
+          if (parts) {
+              return parseInt(parts[1]) * 60 + parseInt(parts[2]);
+          }
+          return Infinity;
+      };
+      return timeToSeconds(a.time) - timeToSeconds(b.time);
+    });
+
+    let lbHtml = '<div class="leaderboard">';
+    lbHtml += '<div class="leaderboard-title">LEADERBOARD</div>';
+    if (allScores.length === 0) {
+      lbHtml += '<p>No results yet.</p>';
+    } else {
+      lbHtml += '<ol>';
+      allScores.slice(0, 10).forEach(p => {
+        // Удалено отображение очков в лидерборде
+        lbHtml += `<li><strong>${p.name}</strong> (${p.group}): ${p.correct}/${p.total} (${p.percent}%) — ${p.date} ${p.gameTime} (${p.time})</li>`;
+      });
+      lbHtml += '</ol>';
+    }
+    lbHtml += '</div>';
+    return lbHtml;
+  }
+
+  // Новая функция для получения HTML-представления достижений
+  getAchievementsHTML() {
+    const playerAchievements = this.players[this.currentPlayer] ? (this.players[this.currentPlayer].achievements || {}) : {};
+    
+    let html = `
+      <div class="achievements">
+        <div class="achievements-title">My Achievements</div>
+        <div class="achievement-list">
+    `;
+
+    for (const key in achievements) {
+      const achievement = achievements[key];
+      const isUnlocked = playerAchievements[key];
+      html += `
+        <div class="achievement-item ${isUnlocked ? 'unlocked' : ''}">
+          <span class="achievement-icon">${achievement.icon}</span>
+          <div class="achievement-name">${achievement.name}</div>
+          <div class="achievement-description">${achievement.description}</div>
+        </div>
+      `;
+    }
+
+    html += `
+        </div>
+      </div>
+    `;
+    return html;
+  }
+
+  // Новая функция для проверки и разблокировки достижений
+  checkAchievements(correctAnswers, totalAnswers) {
+    if (!this.players[this.currentPlayer]) return;
+
+    const player = this.players[this.currentPlayer];
+    let newAchievementUnlocked = false;
+
+    // Достижение "Новичок"
+    if (!player.achievements.novice) {
+      player.achievements.novice = true;
+      this.showAchievementNotification(achievements.novice.name, achievements.novice.icon);
+      newAchievementUnlocked = true;
+    }
+
+    // Достижения "Мастер группы" (100% правильных)
+    const currentGroupKey = this.currentVerbGroupKey;
+    if (correctAnswers === totalAnswers) { // Если все ответы правильные
+      const groupAchievementKey = `master_${currentGroupKey}`;
+      if (achievements[groupAchievementKey] && !player.achievements[groupAchievementKey]) {
+        player.achievements[groupAchievementKey] = true;
+        this.showAchievementNotification(achievements[groupAchievementKey].name, achievements[groupAchievementKey].icon);
+        newAchievementUnlocked = true;
+      }
+    }
+    
+    // Если разблокированы новые достижения, сохраняем изменения
+    if (newAchievementUnlocked) {
+        localStorage.setItem('verbPlayers', JSON.stringify(this.players));
+    }
+  }
+
+  // Новая функция для отображения уведомления об ачивке
+  showAchievementNotification(name, icon) {
+    const notificationContainer = document.getElementById('achievementNotificationContainer');
+    const notificationDiv = document.createElement('div');
+    notificationDiv.className = 'achievement-notification';
+    notificationDiv.innerHTML = `<strong>${icon} Achievement Unlocked! ${icon}</strong><br>${name}`;
+    
+    notificationContainer.appendChild(notificationDiv);
+
+    // Удаляем уведомление через некоторое время
+    setTimeout(() => {
+      notificationDiv.remove();
+    }, 2500); // Анимация длится 2.0s (0.5s slideIn + 1.5s fadeOut), так что 2.5s хватит
+  }
+
+} // Конец класса VerbsTrainer
+
+document.addEventListener('DOMContentLoaded', () => {
+  new VerbsTrainer();
+});
+</script>
+</body>
+</html>
